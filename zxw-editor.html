@@ -1,10 +1,12 @@
-<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <!-- 
 @author Zachary Justin Wartell, 2026.
 @license Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 @git https://github.com/ZacharyWartell/zxw-editor
 -->
-    <head>
+
+<head>
     <style>
         table {
             border: solid 2px black;
@@ -16,42 +18,38 @@
             border: solid 1px;
         }
 
-        menu 
-        {
+        menu {
             border: solid 2px black;
             padding: 2px;
         }
     </style>
     <script>
-        let fileHandle=null;
-        async function saveDOM(handle)
-        {
+        let fileHandle = null;
+        async function saveDOM(handle) {
             // Create a FileSystemWritableFileStream to write to.
             const writable = await handle.createWritable();
             // Write the contents of the file to the stream.
-            const wholeDoc = new XMLSerializer().serializeToString(document);      
-            // \todo partial solution, need to avoid all HTML encodeing characters in the <style> sections                      
-            await writable.write(wholeDoc.replaceAll("\x26\x67\x74\x3B",">"));  
+            const wholeDoc = new XMLSerializer().serializeToString(document);
+            await writable.write(wholeDoc.replaceAll("\x26\x67\x74\x3B", ">"));
             // Close the file and write the contents to disk.
             await writable.close();
-        }        
-        function main() {                
+        }
+        function main() {
             document.getElementById("SaveButton").addEventListener('click',
                 (e) => {
                     if (fileHandle !== null)
                         saveDOM(fileHandle);
-                    else
-                    {
+                    else {
                         const splits = document.documentURI.split("/");
                         //const dir = FileSystemDirectoryHandle.getDirectoryHandle(decodeURIComponent(document.documentURI).replace(/\/.*\.html/,""));
-                        const options=
+                        const options =
                         {
                             //startIn: dir, //decodeURIComponent(document.documentURI),
-                            suggestedName: decodeURIComponent(splits[splits.length-1])
+                            suggestedName: decodeURIComponent(splits[splits.length - 1])
                         };
                         window.showSaveFilePicker(options).then(
-                            async (handle_) => {                            
-                                fileHandle=handle_;
+                            async (handle_) => {
+                                fileHandle = handle_;
                                 console.log(handle_);
                                 saveDOM(fileHandle)
                             });
@@ -62,17 +60,22 @@
     </script>
 </head>
 
-<body onload="main();" >
+<body onload="main();" style="overflow: hidden;">
     <div>
-        <div style="border: 1px black solid; padding: 2px; text-align: center;">
-            <b>zxw-editor</b> <sup>(1.0.x)</sup>  | Author: Zachary Wartell, License: <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
+        <header style="border: 1px black solid; padding: 2px; resize: block; overflow: hidden; max-height: fit-content;">
+            <div style="border: 1px black solid; padding: 2px; text-align: center;">
+                <b>zxw-editor</b> <sup>(1.0.x)</sup> | Author: Zachary Wartell, License: <a rel="license"
+                    href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons
+                    Attribution-NonCommercial-ShareAlike 4.0 International License</a>
+            </div>
+            <menu style="margin-bottom: 0px;">
+                <button id="SaveButton">Save </button>
+            </menu>
+        </header>
+        <div contenteditable="" style="overflow-y:scroll; height: 92vh;">
+            ...your stuff goes here...
         </div>
-        <menu style="margin-bottom: 0px;">
-            <button id="SaveButton">Save </button>
-        </menu>
+    </div>
+</body>
 
-    </div>
-    <div contenteditable="">
-        your stuff goes here
-    </div>
-</body></html>
+</html>
