@@ -29,7 +29,8 @@
             // Create a FileSystemWritableFileStream to write to.
             const writable = await handle.createWritable();
             // Write the contents of the file to the stream.
-            const wholeDoc = new XMLSerializer().serializeToString(document);                            
+            const wholeDoc = new XMLSerializer().serializeToString(document);      
+            // \todo partial solution, need to avoid all HTML encodeing characters in the <style> sections                      
             await writable.write(wholeDoc.replaceAll("\x26\x67\x74\x3B",">"));  
             // Close the file and write the contents to disk.
             await writable.close();
