@@ -35,16 +35,7 @@
             // Close the file and write the contents to disk.
             await writable.close();
         }        
-        function main() {
-            const fixList = document.getElementById("Div_Rubric")?.querySelectorAll('span');
-            let fixArray = [];
-            fixList.forEach((a, b, o) => { fixArray.push(a); });
-            fixArray.filter((e) => e.innerText == "0.00").forEach(
-                (a, b, c) => {
-                    //if (a.previousElementSibling &amp;amp;amp;amp;amp;amp;amp;&amp;amp;amp;amp;amp;amp;amp; a.previousElementSibling.previousElementSibling &amp;amp;amp;amp;amp;amp;amp;&amp;amp;amp;amp;amp;amp;amp; a.previousElementSibling.previousElementSibling.firstChild)                                     
-                    a?.previousElementSibling?.firstElementChild?.removeAttribute("checked");
-                });
-                
+        function main() {                
             document.getElementById("SaveButton").addEventListener('click',
                 (e) => {
                     if (fileHandle !== null)
