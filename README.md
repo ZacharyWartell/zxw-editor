@@ -4,7 +4,7 @@
 - Git: https://github.com/ZacharyWartell/zxw-editor
 - License: [LICENSE.md](LICENSE.md)
 
-Experimental 'in-place', HTML editor.
+zxw-editor is an experimental 'in-place', HTML editor.
 
 - zxw-editor.html can be opened as a local file in Chrome.  The resulting HTML page can be edited in Chrome and then saved to the same or another local .html file.
     - zxw-editor is a [static webpage](https://en.wikipedia.org/wiki/Static_web_page).
