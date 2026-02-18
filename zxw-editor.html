@@ -1,0 +1,84 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">
+<!-- 
+@author Zachary Justin Wartell, 2026.
+@license Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+ -->
+    <head>
+    <style>
+        table {
+            border: solid 2px black;
+            border-collapse: collapse;
+            width: fit-content;
+        }
+
+        td {
+            border: solid 1px;
+        }
+
+        menu 
+        {
+            border: solid 2px black;
+            padding: 2px;
+        }
+    </style>
+    <script>
+        let fileHandle=null;
+        async function saveDOM(handle)
+        {
+            // Create a FileSystemWritableFileStream to write to.
+            const writable = await handle.createWritable();
+            // Write the contents of the file to the stream.
+            const wholeDoc = new XMLSerializer().serializeToString(document);                            
+            await writable.write(wholeDoc.replaceAll("\x26\x67\x74\x3B",">"));  
+            // Close the file and write the contents to disk.
+            await writable.close();
+        }        
+        function main() {
+            const fixList = document.getElementById("Div_Rubric")?.querySelectorAll('span');
+            let fixArray = [];
+            fixList.forEach((a, b, o) => { fixArray.push(a); });
+            fixArray.filter((e) => e.innerText == "0.00").forEach(
+                (a, b, c) => {
+                    //if (a.previousElementSibling &amp;amp;amp;amp;amp;amp;amp;&amp;amp;amp;amp;amp;amp;amp; a.previousElementSibling.previousElementSibling &amp;amp;amp;amp;amp;amp;amp;&amp;amp;amp;amp;amp;amp;amp; a.previousElementSibling.previousElementSibling.firstChild)                                     
+                    a?.previousElementSibling?.firstElementChild?.removeAttribute("checked");
+                });
+                
+            document.getElementById("SaveButton").addEventListener('click',
+                (e) => {
+                    if (fileHandle !== null)
+                        saveDOM(fileHandle);
+                    else
+                    {
+                        const splits = document.documentURI.split("/");
+                        //const dir = FileSystemDirectoryHandle.getDirectoryHandle(decodeURIComponent(document.documentURI).replace(/\/.*\.html/,""));
+                        const options=
+                        {
+                            //startIn: dir, //decodeURIComponent(document.documentURI),
+                            suggestedName: decodeURIComponent(splits[splits.length-1])
+                        };
+                        window.showSaveFilePicker(options).then(
+                            async (handle_) => {                            
+                                fileHandle=handle_;
+                                console.log(handle_);
+                                saveDOM(fileHandle)
+                            });
+                    }
+                });
+        }
+        window.main = main;                               
+    </script>
+</head>
+
+<body onload="main();" >
+    <div>
+    <menu>
+        <button id="SaveButton">Save </button>
+    </menu>
+    <div>
+        Author: Zachary Wartell, License: <a rel="license" href="http://creativecommons.org/lice%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20nses/by-nc-sa/4.0/">Creative                                Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
+    </div>
+    </div>
+    <div contenteditable="">
+        your stuff goes here
+    </div>
+</body></html>
