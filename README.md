@@ -4,7 +4,7 @@
 - Git: https://github.com/ZacharyWartell/zxw-editor
 - License: [LICENSE.md](LICENSE.md)
 
-zxw-editor is an experimental 'in-place', HTML editor.
+zxw-editor is an experimental 'in-place' HTML editor.
 
 - zxw-editor.html can be opened as a local file in Chrome.  The resulting HTML page can be edited in Chrome and then saved to the same or another local .html file.
     - zxw-editor is a [static webpage](https://en.wikipedia.org/wiki/Static_web_page).
@@ -16,6 +16,7 @@ zxw-editor is an experimental 'in-place', HTML editor.
     - Tested with Chrome browser
 
 ## Todo
-- \todo need a few minor tweaks to make it a proper [PWA](https://web.dev/explore/progressive-web-apps)
+- \todo zxw-editor needs a few minor tweaks to make it a proper [PWA](https://web.dev/explore/progressive-web-apps).
+- \todo Integrate the Editor toolbar from my other zxw-mvc subproject.
 
 
