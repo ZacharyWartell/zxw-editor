@@ -11,7 +11,7 @@ zxw-editor is an experimental 'in-place' HTML editor.
     - zxw-editor does _not_ communicate to any server.    
 - zxw-editor leverages [contentedible](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/contenteditable) and [showSaveFilePicker](https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker) to save edits to the webpage (i.e. the local DOM) to a local file.
 - Caveats:
-    - zxw-editor assumes user is comfortable and familiar with using the Chrome Inspector to edit the DOM in addition to editing the contentedible ``` <div> ``` directly using the browsers inherent
+    - zxw-editor assumes the user is comfortable and familiar with using the Chrome Inspector to edit the DOM in addition to editing the contentedible ``` <div> ``` directly using the browser's inherent
   [contentedible](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/contenteditable) editing features.
     - zxw-editor only tested on the Chrome browser.
 
