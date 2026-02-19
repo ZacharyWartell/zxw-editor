@@ -28,13 +28,29 @@
     </style>
     <script>
         let fileHandle = null;
-        async function saveDOM(handle) {
+         async function saveDOM(handle) {
             // Create a FileSystemWritableFileStream to write to.
             const writable = await handle.createWritable();
             // Write the contents of the file to the stream.
-            const wholeDoc = new XMLSerializer().serializeToString(document);
-            await writable.write(wholeDoc.replaceAll("\x26\x67\x74\x3B", ">"));
-            // Close the file and write the contents to disk.
+            let wholeDoc = new XMLSerializer().serializeToString(document);
+            let splits = wholeDoc.split(/<script>|<\/script>/);
+            wholeDoc = "";
+            for (let i=0;i<splits.length;i++)
+            {
+                if (i % 2 == 0)
+                {// odd members are <script> elements
+                    wholeDoc += splits [i];
+                }
+                else
+                {// even members are <script> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;gt; )
+                    /**
+                     *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
+                     */
+                    const fixup = splits [i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
+                    wholeDoc += "<script>" + fixup  + "<\u002Fscript>";
+                }
+            }
+            await writable.write(wholeDoc);            
             await writable.close();
         }
         function main() {
@@ -67,7 +83,7 @@
     <div>
         <header style="border: 1px black solid; padding: 2px; resize: block; overflow: hidden; max-height: fit-content;">
             <div style="border: 1px black solid; padding: 2px; text-align: center;">
-                <b><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor">zxw-editor</a></b> <sup><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor/commits/main/">(1.0.20)</a></sup> | Author: Zachary Wartell, License: 
+                <b><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor">zxw-editor</a></b> <sup><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor/commits/main/">(1.0.21)</a></sup> | Author: Zachary Wartell, License: 
                 <a rel="license" target="_blank"
                     href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons
                     Attribution-NonCommercial-ShareAlike 4.0 International License</a>
