@@ -28,52 +28,84 @@
     </style>
     <script>
         let fileHandle = null;
-         async function saveDOM(handle) {
+        async function saveDOM(handle) {
             // Create a FileSystemWritableFileStream to write to.
             const writable = await handle.createWritable();
             // Write the contents of the file to the stream.
             let wholeDoc = new XMLSerializer().serializeToString(document);
             let splits = wholeDoc.split(/<script>|<\/script>/);
             wholeDoc = "";
-            for (let i=0;i<splits.length;i++)
-            {
-                if (i % 2 == 0)
-                {// odd members are <script> elements
-                    wholeDoc += splits [i];
+            for (let i = 0; i < splits.length; i++) {
+                if (i % 2 == 0) {// odd members are <script> elements
+                    wholeDoc += splits[i];
                 }
-                else
-                {// even members are <script> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;gt; )
+                else {// even members are <script> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;gt; )
                     /**
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
-                    const fixup = splits [i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
-                    wholeDoc += "<script>" + fixup  + "<\u002Fscript>";
+                    const fixup = splits[i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
+                    wholeDoc += "<script>" + fixup + "<\u002Fscript>";
                 }
             }
-            await writable.write(wholeDoc);            
+            await writable.write(wholeDoc);
             await writable.close();
+            console.log("saveDOM complete");
+        }
+        async function saveCallback() {
+            if (fileHandle !== null)
+                await saveDOM(fileHandle);
+            else {
+                const splits = document.documentURI.split("/");
+                //const dir = FileSystemDirectoryHandle.getDirectoryHandle(decodeURIComponent(document.documentURI).replace(/\/.*\.html/,""));
+                const options =
+                {
+                    //startIn: dir, //decodeURIComponent(document.documentURI),
+                    suggestedName: decodeURIComponent(splits[splits.length - 1])
+                };
+                await window.showSaveFilePicker(options).then(
+                    async (handle_) => {
+                        fileHandle = handle_;
+                        console.log(handle_);
+                        await saveDOM(fileHandle);
+                    });
+            }
+        }
+        async function redactSaveCallback() 
+        {
+            const rs = document.querySelectorAll("*.Redacted");
+            const rfs = []; // redactedFragments
+
+            /** create DocuementFragments to temporarily hold all .Redacted HTMLElements */
+            for (let r of rs)
+            {
+                const f = document.createDocumentFragment();
+                let n = r.children[0];
+                for (let n = r.children[0]; n !== null;)
+                {
+                    //c.remove();
+                    const next = n.nextSibling;
+                    f.appendChild(n);
+                    n = next;
+                }
+
+                rfs.push(f);
+            }
+            console.log("redacted");
+            await saveCallback();
+            /** put back all .Redacted HTMLElements child nodes */
+            let i=0;
+            for (let r of rs)
+            {            
+                for (let c of rfs[i].childNodes)
+                    r.appendChild(c);
+                i++;
+            }    
+            console.log("unredacted");
+            return;         
         }
         function main() {
-            document.getElementById("SaveButton").addEventListener('click',
-                (e) => {
-                    if (fileHandle !== null)
-                        saveDOM(fileHandle);
-                    else {
-                        const splits = document.documentURI.split("/");
-                        //const dir = FileSystemDirectoryHandle.getDirectoryHandle(decodeURIComponent(document.documentURI).replace(/\/.*\.html/,""));
-                        const options =
-                        {
-                            //startIn: dir, //decodeURIComponent(document.documentURI),
-                            suggestedName: decodeURIComponent(splits[splits.length - 1])
-                        };
-                        window.showSaveFilePicker(options).then(
-                            async (handle_) => {
-                                fileHandle = handle_;
-                                console.log(handle_);
-                                saveDOM(fileHandle)
-                            });
-                    }
-                });
+            document.getElementById("SaveButton").addEventListener('click',saveCallback);                
+            document.getElementById("RedactSaveButton").addEventListener('click',redactSaveCallback);                
         }
         window.main = main;                               
     </script>
