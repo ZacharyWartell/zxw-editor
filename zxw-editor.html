@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<!-- 
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- 
 @author Zachary Justin Wartell, 2026.
 @license Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 @git https://github.com/ZacharyWartell/zxw-editor
 -->
 
 <head>
-    <link rel="manifest" crossorigin="use-credentials" href="manifest.json">
-    <link rel="shortcut icon" type="image/png" href="icons/icon48.png">
-    <link rel="shortcut icon" type="image/png" href="icons/icon144.png">    
+    <link rel="manifest" crossorigin="use-credentials" href="manifest.json" />
+    <link rel="shortcut icon" type="image/png" href="icons/icon48.png" />
+    <link rel="shortcut icon" type="image/png" href="icons/icon144.png" />
     <style>
         table {
             border: solid 2px black;
@@ -25,6 +24,16 @@
             border: solid 2px black;
             padding: 2px;
         }
+
+        *.Redacted {
+            border: 1px dotted red;
+        }
+
+        *.Redacted::before {
+            content: "Redacted";
+            background-color: yellow;
+            color: red;
+        }
     </style>
     <script>
         let fileHandle = null;
@@ -39,7 +48,7 @@
                 if (i % 2 == 0) {// odd members are <script> elements
                     wholeDoc += splits[i];
                 }
-                else {// even members are <script> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;gt; )
+                else {// even members are <script> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;gt; )
                     /**
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
@@ -70,18 +79,15 @@
                     });
             }
         }
-        async function redactSaveCallback() 
-        {
+        async function redactSaveCallback() {
             const rs = document.querySelectorAll("*.Redacted");
             const rfs = []; // redactedFragments
 
             /** create DocuementFragments to temporarily hold all .Redacted HTMLElements */
-            for (let r of rs)
-            {
+            for (let r of rs) {
                 const f = document.createDocumentFragment();
                 let n = r.children[0];
-                for (let n = r.children[0]; n !== null;)
-                {
+                for (let n = r.children[0]; n !== null;) {
                     //c.remove();
                     const next = n.nextSibling;
                     f.appendChild(n);
@@ -93,19 +99,18 @@
             console.log("redacted");
             await saveCallback();
             /** put back all .Redacted HTMLElements child nodes */
-            let i=0;
-            for (let r of rs)
-            {            
+            let i = 0;
+            for (let r of rs) {
                 for (let c of rfs[i].childNodes)
                     r.appendChild(c);
                 i++;
-            }    
+            }
             console.log("unredacted");
-            return;         
+            return;
         }
         function main() {
-            document.getElementById("SaveButton").addEventListener('click',saveCallback);                
-            document.getElementById("RedactSaveButton").addEventListener('click',redactSaveCallback);                
+            document.getElementById("SaveButton").addEventListener('click', saveCallback);
+            document.getElementById("RedactSaveButton").addEventListener('click', redactSaveCallback);
         }
         window.main = main;                               
     </script>
@@ -113,11 +118,15 @@
 
 <body onload="main();" style="overflow: hidden;">
     <div>
-        <header style="border: 1px black solid; padding: 2px; resize: block; overflow: hidden; max-height: fit-content;">
+        <header
+            style="border: 1px black solid; padding: 2px; resize: block; overflow: hidden; max-height: fit-content;">
             <div style="border: 1px black solid; padding: 2px; text-align: center;">
-                <b><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor">zxw-editor</a></b> <sup><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor/commits/main/">(1.0.22)</a></sup> | Author: Zachary Wartell, License: 
-                <a rel="license" target="_blank"
-                    href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons
+                <b><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor">zxw-editor</a></b> <sup><a
+                        target="_blank"
+                        href="https://github.com/ZacharyWartell/zxw-editor/commits/main/">(1.0.22)</a></sup> | Author:
+                Zachary Wartell, License:
+                <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
+                    Commons
                     Attribution-NonCommercial-ShareAlike 4.0 International License</a>
             </div>
             <menu style="margin-bottom: 0px;">
@@ -126,9 +135,7 @@
             </menu>
         </header>
         <div contenteditable="" style="overflow-y:scroll; height: 92vh;">
-            ...your stuff goes here...
         </div>
-    </div>
 </body>
 
 </html>
