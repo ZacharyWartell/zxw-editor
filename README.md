@@ -17,8 +17,10 @@ zxw-editor is an experimental 'in-place' HTML editor.
     - zxw-editor only tested on the Chrome browser.
 
 ## Todo
+- \todo reorg the GitHub pages to only include the 'app'
 - \todo zxw-editor needs a few minor tweaks to make it a proper [PWA](https://web.dev/explore/progressive-web-apps).
 - \todo Integrate the Editor toolbar from my other zxw-mvc project.
+
 
 
 
