@@ -1,1 +1,1 @@
-export ZJWP_PROJECT_WWW_SUBDIR=.
+export ZJWP_PROJECT_WWW_SUBDIR=www-doc
