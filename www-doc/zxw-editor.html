@@ -81,7 +81,7 @@
                 }
             }
 
-            splits = wholeDoc.split(/<style>|<\/style>/);
+            splits = wholeDoc.split(/<style>|<\u002Fstyle>/);
             wholeDoc = "";
             for (let i = 0; i < splits.length; i++) {
                 if (i % 2 == 0) {// odd members are <script> elements
@@ -94,7 +94,22 @@
                     const fixup = splits[i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
                     wholeDoc += "<style>" + fixup + "<\u002Fstyle>";
                 }
-            }            
+            }    
+            
+            /**
+             * these are needed/useful when zxw-edtior.html is server over http, but must be removed
+             * when saving to a local .html file that will later be openned from the local file system
+             * (CORS policy will not allow <link> to be loaded when a browser is opening a local file)
+             */
+            const removals=[
+            `<link rel="manifest" crossorigin="use-credentials" href="manifest.json" />`
+            `<link rel="shortcut icon" type="image/png" href="icons/icon48.png" />`
+            `<link rel="shortcut icon" type="image/png" href="icons/icon144.png" />`];
+            for (let r of removals)
+            {
+                wholeDoc = wholeDoc.replace(r,"");
+            }
+
             await writable.write(wholeDoc);
             await writable.close();
             console.log("saveDOM complete");

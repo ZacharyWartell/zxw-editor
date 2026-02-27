@@ -9,7 +9,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Open zxw-editor.html",
-            "file": "\\\\wsl.localhost\\Ubuntu-24.04\\home\\zwartell\\unison-cloud\\zjw-alpha\\projects\\cross-cutting\\zxw-editor\\index.html"
+            "file": "\\\\wsl.localhost\\Ubuntu-24.04\\home\\zwartell\\unison-cloud\\zjw-alpha\\projects\\cross-cutting\\zxw-editor\\www-doc\\index.html"
         }
     ]
 }
