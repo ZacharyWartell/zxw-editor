@@ -1,7 +1,7 @@
 # zxw-editor
 
 ### Author: Zachary Justin Wartell, Ph.D.
-- App: https://zacharywartell.github.io/zxw-editor/zxw-editor.html
+- App: https://www.zacharywartell.net/zxw-editor
 - Git: https://github.com/ZacharyWartell/zxw-editor
 - License: [LICENSE.md](LICENSE.md)
 
