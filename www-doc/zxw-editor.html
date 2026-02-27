@@ -67,6 +67,24 @@
         async function saveDOM(handle) {
             // Create a FileSystemWritableFileStream to write to.
             const writable = await handle.createWritable();
+
+            /** create DocumentFragments that will temporarily hold and hide all data-non-saved-content HTMLElements 
+             *  this is seemingly a necessary complication of making a single-page, static .html file that can save itself.
+             */
+            const rs = document.querySelectorAll("*[data-non-saved-content]");
+            const rfs = []; // redactedFragments
+
+            for (let r of rs) {
+                const f = document.createDocumentFragment();
+                let n = r.children[0];
+                for (let n = r.children[0]; n !== null;) {                 
+                    const next = n.nextSibling;
+                    f.appendChild(n);
+                    n = next;
+                }
+                rfs.push(f);
+            }
+
             // Write the contents of the file to the stream.
             let wholeDoc = new XMLSerializer().serializeToString(document);
             let splits = wholeDoc.split(/<script>|<\/script>/);
@@ -95,7 +113,7 @@
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
                     const fixup = splits[i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
-                    wholeDoc += "<style>" + fixup + "<\u002Fstyle>";
+                    wholeDoc += "\u003Cstyle>" + fixup + "<\u002Fstyle>";
                 }
             }    
             
@@ -116,6 +134,14 @@
 
             await writable.write(wholeDoc);
             await writable.close();
+
+            /** put back all data-non-saved-content HTMLElements child nodes */
+            let i = 0;
+            for (let r of rs) {
+                for (let c of rfs[i].childNodes)
+                    r.appendChild(c);
+                i++;
+            }
             console.log("saveDOM complete");
         }
         async function saveCallback() {
@@ -300,7 +326,7 @@
             <section>
                 <h2>GUI</h2>
                 <hr>
-                <ul id="GUI">
+                <ul id="GUI" data-non-saved-content="">
                 </ul>
                 <hr>                
             </section>
