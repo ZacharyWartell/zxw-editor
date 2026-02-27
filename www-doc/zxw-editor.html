@@ -60,6 +60,9 @@
          @brief saveDOM saves the current DOM to .html file whose file handle is 'handle' using XMLSerializer.
          For <script> and <style> elements the content, avoid letting XMLSerializer convert operator characters 
          to HTML entities (i.e. do not change > to "&gt;")
+
+         Note the used of unicode escape sequences in some of the strings below are necessary to avoid
+         replacing characters in situations they should not be replaced.
          */
         async function saveDOM(handle) {
             // Create a FileSystemWritableFileStream to write to.
@@ -69,7 +72,7 @@
             let splits = wholeDoc.split(/<script>|<\/script>/);
             wholeDoc = "";
             for (let i = 0; i < splits.length; i++) {
-                if (i % 2 == 0) {// odd members are <script> elements
+                if (i % 2 == 0) {// odd members are not <script> elements
                     wholeDoc += splits[i];
                 }
                 else {// even members are <script> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;gt; )
@@ -81,13 +84,13 @@
                 }
             }
 
-            splits = wholeDoc.split(/<style>|<\u002Fstyle>/);
+            splits = wholeDoc.split(/\u003Cstyle>|<\u002Fstyle>/);
             wholeDoc = "";
             for (let i = 0; i < splits.length; i++) {
-                if (i % 2 == 0) {// odd members are <script> elements
+                if (i % 2 == 0) {// odd members are not <style> elements
                     wholeDoc += splits[i];
                 }
-                else {// even members are <script> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;gt; )
+                else {// even members are <style> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;gt; )
                     /**
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
@@ -102,12 +105,13 @@
              * (CORS policy will not allow <link> to be loaded when a browser is opening a local file)
              */
             const removals=[
-            `<link rel="manifest" crossorigin="use-credentials" href="manifest.json" />`
-            `<link rel="shortcut icon" type="image/png" href="icons/icon48.png" />`
+            `<link rel="manifest" crossorigin="use-credentials" href="manifest.json" />`,
+            `<link rel="shortcut icon" type="image/png" href="icons/icon48.png" />`,
             `<link rel="shortcut icon" type="image/png" href="icons/icon144.png" />`];
             for (let r of removals)
             {
-                wholeDoc = wholeDoc.replace(r,"");
+                const tmp = wholeDoc.replace(r,""); 
+                wholeDoc = tmp;
             }
 
             await writable.write(wholeDoc);
