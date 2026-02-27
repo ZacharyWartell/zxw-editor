@@ -158,6 +158,13 @@
                 }
             }
         }
+        DOCS +=
+        `@##GUI
+         <span>Edit Mode</span> | Toggle <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/contenteditable" target="_blank">contentedible</a>
+         on and off of all HTML elements with the contentedible attribute.
+
+         Chrome will only follow hyperlinks using the standard gestures, if Edit Mode is disabled.
+        `;        
         function main() {
             let helpDialog = document.getElementById("HelpDialog");
             //document.getElementById("OpenButton").addEventListener('click', openCallback);
@@ -165,6 +172,17 @@
             document.getElementById("RedactSaveButton").addEventListener('click', redactSaveCallback);
             buildHelpDialog();
             window.helpDialog = helpDialog;
+
+            document.getElementById("EditMode").addEventListener('input',
+                (e)=>
+                {
+                    const ces = document.querySelectorAll("*[contenteditable]");
+                    for (let ce of ces)
+                    {
+                        ce.setAttribute("contenteditable", e.currentTarget.checked ? "true" : "false");
+                    }
+                }
+            )
         }
         window.main = main;                               
         //window.helpDialog = helpDialog;
@@ -187,7 +205,11 @@
             <menu style="margin-bottom: 0px;">
                 <button disabled id="OpenButton">Open</button>
                 <button id="SaveButton">Save</button>
-                <button id="RedactSaveButton">Redact &amp; Save</button>
+                <button id="RedactSaveButton">Redact &amp; Save</button>                
+                <div style="border: 1px solid black; display: inline-block;">
+                    <label for="EditMode">Edit Mode</label>
+                    <input type="checkbox" id="EditMode" value="EditMode" checked/>
+                </div>
                 <button id="HelpButton" onclick="window.helpDialog.showModal();">Help</button>
             </menu>
         </header>
