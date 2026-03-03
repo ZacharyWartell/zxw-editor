@@ -1,6 +1,7 @@
 # zxw-editor
 
 ### Author: Zachary Justin Wartell, Ph.D.
+- App: https://zacharywartell.github.io/zxw-editor/zxw-editor.html
 - Git: https://github.com/ZacharyWartell/zxw-editor
 - License: [LICENSE.md](LICENSE.md)
 
@@ -18,5 +19,6 @@ zxw-editor is an experimental 'in-place' HTML editor.
 ## Todo
 - \todo zxw-editor needs a few minor tweaks to make it a proper [PWA](https://web.dev/explore/progressive-web-apps).
 - \todo Integrate the Editor toolbar from my other zxw-mvc project.
+
 
 
