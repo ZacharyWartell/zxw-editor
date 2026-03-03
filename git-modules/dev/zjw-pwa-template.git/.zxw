@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+VERSION=1.0.1
+FILES=$(find .zxw-env -name "*.sh")
+echo ROOT: $(pwd)
+ROOT="$(pwd)"
+for FILE in $FILES; do
+    source $FILE "$ROOT"
+done

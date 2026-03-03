@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# extract \todo demarcated lins from source code files (.html,.js) 
+# and place them in an output file \a $1
+
+
+#pushd "`pwd`"
+# echo "<html lang="en">"             > todo.html
+# echo "<head>"                       >> todo.html
+# echo "</head>"                      >> todo.html
+# echo "<body>"                       >> todo.html
+
+OUTPUT=$1
+OIFS="$IFS"
+IFS=$'\n'
+FILES=`find . \( -name "*.html" -o -name "*.js" \) -printf '%p\n' | xargs -0`
+rm -f "$OUTPUT"
+echo // `date` >> "$OUTPUT"
+echo { >> "$OUTPUT"
+
+for f in $FILES; do     
+    if [[ `basename $f` != "DeveloperNotes.html" ]]; then
+        echo checking: $f
+        #echo "<li>"                     >> todo.html
+        if [[ $OUTPUT != "" ]]; then
+            #ls -la "$OUTPUT"             
+            echo file: $f >> "$OUTPUT" 
+            git blame "$f" | grep '\\todo' >> "$OUTPUT" 
+            
+            #cat tmp.txt >> "../dev/shit.txt" 
+            # | cat >> "$1"
+            # "$1"            
+            #line=`git blame "$f" | grep -H '\todo'`
+            #echo -e `basename $f` "|" $line "\n"
+            # > $1
+        else
+            echo file: $f >> "$OUTPUT" 
+            git blame "$f" | grep '\\todo'
+            #line=`git blame "$f" | grep -H '\todo'`
+            #echo -e `basename $f` "|" $line "\n" 
+            # > $1
+        fi
+        #git blame "$f" | grep '\todo'   >> todo.html  
+        #echo "</li>"                    >> todo.html
+    fi
+done
+IFS="$OIFS"
+echo } >> "$OUTPUT"
+
+#popd
+
+# echo "</body>"                      >> todo.html
+# echo "</html>"                      >> todo.html

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+#
+# @author Zachary Wartell with terrifying contributions from MS Copilot
+#
+# Package Requirements:
+#   - git
+#   - inotify-tools
+#
+# \ref https://github.com/inotify-tools/inotify-tools/wiki
+#
+
+if [[ "$#" -gt 0  ]]; then
+    TARGET=$1
+    APPEND_MESSAGE=$2
+else    
+    TARGET="./save.html"
+fi
+
+OLD_DATE=`stat -c "%y" "$TARGET"`
+while [[ 1 ]] 
+do
+    #echo $OLD_DATE
+    NEW_DATE=`stat -c "%y" "$TARGET"`
+    if [[ "$OLD_DATE" != "$NEW_DATE" ]]; then
+        echo "File $TARGET changed at $NEW_DATE"
+        OLD_DATE="$NEW_DATE"
+        
+        if [[ `echo $TARGET | grep -E ".*\.html"` != "" ]]; then
+            echo HTML: $TARGET
+            if [[ `which js-beautify` != "" ]]; then
+                echo running js-beaufiy ...
+                js-beautify --type html -s 4 --replace $TARGET
+            fi
+        fi
+        echo git commit -m "Auto-save: $NEW_DATE: '$APPEND_MESSAGE'" "$TARGET" 
+        git commit -m "Auto-save: $NEW_DATE: '$APPEND_MESSAGE'" "$TARGET" >/dev/null 2>&1
+        #echo "Committed changes to $TARGET"
+    fi
+    sleep 10
+done
+
+exit 0
+
+
+##
+## bizarrely inotifywait doesn't work with a file that is open within a browser using the https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker
+##
+#TARGET="/mnt/c/Users/zwart/Dropbox (Personal)/Personal/Aila Art/directory-migration-and-reorg/saves/"
+while [  1 ] 
+do
+    inotifywait -mr \
+    --timefmt '%d/%m/%y %H:%M' --format '%T %w %f' \
+    -e modify "$TARGET" |
+    while read -r date time dir file; do
+        changed_abs=${dir}${file}
+        changed_rel=${changed_abs#"$cwd"/}
+
+        echo "At ${time} on ${date}, file $changed_abs changed" >&2
+    done
+done
+
+exit 0
+
+
+exit 0
+
+

@@ -1,0 +1,25 @@
+
+                <!DOCTYPE html>
+                <html lang="en">
+                
+                <body>
+                <div id="UserDocument" contenteditable="">      <h1>Directory structure</h1>      <ul class="DirectoryStructure">        <li><span>zjw-project-foo</span></li>        <ul>          <li><span>.git</span></li>ls          <li><span>git-modules</span></li>          <ul>            <li><span>zjw-pwa-template</span></li>            <ul>              <li><span>scripts</span></li>              <li><span>man</span></li>              <ul>                <li><span>zjw-pwa-template-man.html</span></li>              </ul>            </ul>          </ul>          <li><span>scripts</span> <span class="Comment">scripts used for developing zjw-project-foo&nbsp; (make files, cmake files, etc.)</span></li>          <ul>            <li><span>zjwp → git-modules/zjw-pwa-template/scripts</span></li>          </ul>          <li><span>(www-app | www-site)</span> <span class="Comment">pwa or traditional www site.&nbsp; This is the <u>only</u> directory published to the webserver</span>                    </li>          <ul>            <li><span>images</span></li>            <li><span>videos</span></li>            <li><span>index.html</span></li><li><span>modules</span><ul>x<li><span>xyz-module&nbsp;</span><span style="font-weight: 700;">→ <i>[symbolic link to xyz-module]</i>/www-lib</span></li></ul></li>          </ul>          <li><span>dev</span></li>        </ul>        <li class="Template"> |DIR NAME| <span class="Comment">|COMMENT|</span>        </li>      </ul>      <p><br>      </p>    
+<section>
+    <h2>Instructions</h2>
+    <div>
+       _Div_
+    <ol>
+        <li>Create new directory:&nbsp; &nbsp; &nbsp; <br>| $ mkdir project-foo-bar</li>
+        <li>Git init:&nbsp; &nbsp;<br>| project-foo-bar $&nbsp; git init</li><li>Add zjw-pwa-template submodule:&nbsp; &nbsp;<br>| project-foo-bar&nbsp;$&nbsp; git add submodule&nbsp;https://gitlab.com/zachary-wartell-public/zjw-pwa-template.git git-modules/zjw-pwa-template</li><li>Run zjwp-init-project.&nbsp; &nbsp;The script will asked you several questions that will be used to customize the template files.<br>| project-foo-bar&nbsp;$&nbsp;&nbsp;git-modules/zjw-pwa-template/zjwp-init-project</li><li><br></li>
+    </ol>
+    </div>
+</section>
+<section>
+    <h2>_H2_</h2>
+    <div>
+        _Div_
+    </div>
+</section></div>
+                </body>
+                </html>
+                

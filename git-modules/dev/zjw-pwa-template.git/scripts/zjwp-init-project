@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+# @author Zachary Wartell
+
+# @brief initialize current project contain the zjw-pwa-template directory structure and scripts
+
+# \ref https://www.gnu.org/software/bash/manual/html_node/Bash-Conditional-Expressions.html
+# \ref https://man7.org/linux/man-pages/man5/proc_sys_kernel.5.html  (for /proc/sys/kernel/random/uuid)
+
+
+VERSION=0.1.26
+
+UNNAME=$(uname)
+
+ZJWP_PROJECT_PATH_SUFFIX=""
+while [ True ]; do
+  if [ "$1" = "--project-path-suffix" -o "$1" = "-pps" ]; then      
+      ZJWP_PROJECT_PATH_SUFFIX=$2
+      shift 2
+  elif [ "$1" = "--skip-www-dir" ]; then
+      SKIP_WWW_DIR=""
+      shift 1
+  else
+      break
+  fi
+done
+
+# find root .git directory of this project
+if [[ ! -v ZJWP_PROJECT_GIT_ROOT ]]; then    
+    # find root .git directory of this project
+    pushd . > /dev/null
+    GIT_ROOT=`pwd`
+    while [[ ! -d ".git" ]]; do
+        cd ..    
+        GIT_ROOT=`pwd`
+        #echo here: "$ROOT"
+    done
+    popd > /dev/null    
+    ZJWP_PROJECT_GIT_ROOT="$GIT_ROOT"
+    $GIT_ROOT="$GIT_ROOT"    
+else
+    GIT_ROOT="$ZJWP_PROJECT_GIT_ROOT"
+fi
+
+PROJECT_PATH="$ZJWP_PROJECT_GIT_ROOT/$ZJWP_PROJECT_PATH_SUFFIX"
+
+
+echo PROJECT_PATH: "$PROJECT_PATH"
+echo GIT_ROOT: "$GIT_ROOT"
+
+
+#
+# generate GUID for this project
+#
+if [[ "$UNNAME" =~ ^MINGW64_NT.* ]]; then
+    GUID=`uuidgen`
+else
+    GUID=`cat /proc/sys/kernel/random/uuid`
+fi
+
+#
+# get user input
+#
+echo To initialize various template files please answer the following questions:
+echo -n "What is your name? "
+read name
+
+echo -n "Do you want to use www-site or www-app for your website or app [site/app]? "
+read site_app
+
+
+WWW_DIR="www-$site_app"
+
+echo WWW_DIR: $WWW_DIR
+
+if [[ ! -d "$PROJECT_PATH/scripts" ]]; then
+    mkdir "$PROJECT_PATH/scripts" 
+fi
+
+#
+# find zjw-pwa-template git module
+3
+ZJWP_GIT_MODULE_SUBDIR=$(find "$GIT_ROOT" -name "zjw-pwa-template" -type d ! -path "*.git/*" | head -n 1)
+ZJWP_GIT_MODULE_SUBDIR=$(dirname "$ZJWP_GIT_MODULE_SUBDIR")
+ZJWP_GIT_MODULE_SUBDIR=$(basename "$ZJWP_GIT_MODULE_SUBDIR")
+
+if [[ "$ZJWP_GIT_MODULE_SUBDIR" == "." ]]; then
+    # new scheme in play
+    ZJWP_GIT_MODULE_SUBDIR=$(find "$GIT_ROOT" -name "zjw-pwa-template.git" -type d ! -path "*.git/*" | head -n 1)
+    ZJWP_GIT_MODULE_SUBDIR=$(dirname "$ZJWP_GIT_MODULE_SUBDIR")
+    ZJWP_GIT_MODULE_SUBDIR=$(basename "$ZJWP_GIT_MODULE_SUBDIR")    
+fi
+
+echo "ZJWP_GIT_MODULE_SUBDIR: $ZJWP_GIT_MODULE_SUBDIR"
+
+
+#
+# create zjwp-config.sh
+#
+echo "export ZJWP_PROJECT_WWW_SUBDIR=$WWW_DIR"                > "$PROJECT_PATH/scripts/zjwp-config.sh"
+echo "export ZJWP_GIT_MODULE_SUBDIR=$ZJWP_GIT_MODULE_SUBDIR" >> "$PROJECT_PATH/scripts/zjwp-config.sh"
+
+
+#
+# create www-x directory and copy template files
+#
+if  [[ ! -d "SKIP_WWW_DIR" ]]; then
+    #echo cp -r "$GIT_ROOT/www-x/*" "$GIT_ROOT/$WWW_DIR"
+    #cp -r -u "$GIT_ROOT/www-x/"* "$GIT_ROOT/$WWW_DIR"
+    #mkdir "$GIT_ROOT/$WWW_DIR"
+    cp -r -u "$GIT_ROOT/$ZJWP_GIT_MODULE_SUBDIR/zjw-pwa-template/www-x" "$PROJECT_PATH/$WWW_DIR"
+    #echo cp -r "$GIT_ROOT/git-modules/zjw-pwa-templates/www-x/*" "$GIT_ROOT/$WWW_DIR/"
+
+    # add GUID to copied template files    
+    echo ----------------------------------------
+    pushd "$GIT_ROOT/$WWW_DIR"    
+        sed -i -e "s/data-guid=\"\"/data-guid=\"$GUID\"/" -e 's/@initilized=false/@initilized=true"/' -e "s/Arthur Dent/$name/"  index.html    
+        sed -i -e "s/data-guid=\"\"/data-guid=\"$GUID\"/" -e 's/@initilized=false/@initilized=true"/' -e "s/Arthur Dent/$name/"  user-guide.html    
+        sed -i -e "s/data-guid=\"\"/data-guid=\"$GUID\"/" -e 's/@initilized=false/@initilized=true"/' -e "s/Arthur Dent/$name/"  main.ts
+        sed -i -e "s/data-guid=\"\"/data-guid=\"$GUID\"/" -e 's/@initilized=false/@initilized=true"/' -e "s/Arthur Dent/$name/"  main.js
+        sed -i -e "s/data-guid=\"\"/data-guid=\"$GUID\"/" -e 's/@initilized=false/@initilized=true"/' -e "s/Arthur Dent/$name/"  manifest.json
+    popd
+fi
+
+##
+## initialize dev scripts
+##
+
+#
+# initialize files
+#
+#for FILE in `find "$GIT_ROOT/$ZJWP_GIT_MODULE_SUBDIR/zjw-pwa-template/scripts/templates" -maxdepth 1 -mindepth 1 -print0 | xargs -0 -I {}`; do
+for FILE in `find "$GIT_ROOT/$ZJWP_GIT_MODULE_SUBDIR/zjw-pwa-template/scripts/templates" -maxdepth 1 -mindepth 1`; do
+    cp -r "$FILE" "$PROJECT_PATH/scripts"
+done
+
+#mkdir "$GIT_ROOT/scripts"
+
+#
+# create symbolic link to zjw-pwa-template/scripts
+#
+
+# \todo [refactor] refactor this code into common module
+if [[ "$UNNAME" =~ ^MINGW64_NT.*  || "$UNNAME" =~ ^MSYS_NT.* ]]; then
+    # Microsoft Windows on Administrator account can create 'real' Windows symbolic links
+    
+    echo "Detected Microsoft Windows environment, creating symbolic link using mklink command"
+    DIR1=`cygpath -w -a "$PROJECT_PATH/scripts"`
+    DIR2A=`cygpath -w -a "$GIT_ROOT/$ZJWP_GIT_MODULE_SUBDIR/zjw-pwa-template/scripts"`
+    DIR2R=`realpath --relative-to="$DIR1" "$DIR2A"`
+    ARGS="/c cd \"$DIR1\" & mklink /d zjwp \"$DIR2R\""
+    echo ARGS: $ARGS
+    powershell Start-Process cmd.exe -ArgumentList "'$ARGS'" -Verb RunAs
+else
+    ln -s "./$ZJWP_GIT_MODULE_SUBDIR/zjw-pwa-template/scripts" "$GIT_ROOT/scripts/zjwp"
+fi

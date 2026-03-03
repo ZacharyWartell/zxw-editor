@@ -1,0 +1,203 @@
+#!/usr/bin/env bash
+# @author Zachary Wartell
+
+# Software Installation Prerequisites:
+#   - rsync
+#   - node
+#   - npx
+#   - http-server
+
+# NOPE:
+#   - wget
+
+#
+#
+# \ref https://manpages.ubuntu.com/manpages/noble/en/man1/rsync.1.html
+
+VERSION="1.11.3"
+
+##
+## Begin "ZJWP bash script header"
+##
+ZJWP="$(dirname "$0")"
+source "$ZJWP/zjwp-core"
+zjwp-require node npx sftp
+# temporarily removed code below:  test for npm install of http-server requires updates to zjwp-require
+#zjwp-require rsync node npx http-server sftp
+
+if [[ ! -v ZJWP_PROJECT_GIT_ROOT ]]; then
+    echo Environment variable $ZJWP_PROJECT_GIT_ROOT is not set.  zjwp-set-path must be run from the shell to set zjwp-pwa-template env. variables for this project.
+    exit 0;
+fi
+
+source "$ZJWP_PROJECT_GIT_ROOT/scripts/zjwp-config.sh"
+##
+## End "ZJWP bash script header"
+##
+
+function usage() 
+{
+read -r -d '' USAGE << EOM
+        Usage:  $(basename $0) [options] <command>
+        (v$VERSION)
+        Options:
+            -h, --help          Show this help message
+            -v, --version       Show version information
+            --sftp              use sftp instead of rsync
+            --dry-run           run rsync with the rsync --dry-run option
+        Commands:
+            none
+
+
+        $(basename $0) executes rsync or sftp to publish a website whose dev. environment uses the zjw-pwa-template scripts. 
+        
+        Required Configuration Files:  
+            - \$GIT_REPO_ROOT/scripts/publish.config                            
+        Assumptions:
+            - Website file are in '\$GIT_REPO_ROOT/site'.  If the site contains symlinks zjwp-publish-www will make
+              copies of the symlink'd resources before copying to the website (publish.config)
+EOM
+    echo "$USAGE"    
+
+}
+
+#
+# default settings
+#
+WWW_REMOTE_PATH_SUFFIX="$ZJWP_PROJECT_NAME"
+DRY_RUN=""
+PUBLISH_METHOD="rsync"
+
+#
+# parse command-line arguments
+# 
+while [ True ]; do
+  if [[ "$1" = "--remote-path-suffix" || "$1" = "-rps" ]]; then
+      WWW_REMOTE_PATH_SUFFIX=$2
+      shift 2
+  elif [[ "$1" = "--sftp" ]]; then      
+      PUBLISH_METHOD="sftp"      
+      shift 1      
+  elif [[ "$1" = "--dry-run" ]]; then
+      DRY_RUN="--dry-run"
+      shift 1
+  elif [[ "$1" = "--help" ]]; then      
+      usage
+      shift 1
+      exit 0
+  else
+      break
+  fi
+done
+
+if [[ $PUBLISH_METHOD == 'rsync' ]]; then
+    # use rsync to transfer to server
+    zjwp-require rsync
+
+    source "scripts/publish.config"    
+    
+    # these defaults are for backwards compatibility
+    if [[ ! -v WWW_HOST ]]; then
+        WWW_HOST=www.zacharywartell.net
+    fi
+    if [[ ! -v RSYNC_HOST_PATH ]]; then
+        RSYNC_HOST_PATH="zjayuu@www.zacharywartell.net:/var/www/html/$WWW_REMOTE_PATH_SUFFIX"
+    fi
+    if [[ ! -v RSYNC_SSH_CMD ]]; then
+        RSYNC_SSH_CMD="ssh -i $HOME/.ssh/id_ed25519-toybox-2020-wsl -l zjayuu"
+    fi        
+    #WWW_REMOTE_PATH="zjayuu@www.zacharywartell.net:/home/zjayuu/zxw-checklist"
+    
+    #\todo need to generalize 
+    LOCAL_PATH="$ZJWP_PROJECT_GIT_ROOT/$ZJWP_PROJECT_WWW_SUBDIR"
+
+    echo $WWW_HOST
+    echo $RSYNC_HOST_PATH
+    echo $RSYNC_SSH_CMD    
+
+    pushd "$ZJWP_PROJECT_GIT_ROOT" > /dev/null
+
+    #
+    # start local server
+    #
+    pushd "$ZJWP_PROJECT_WWW_SUBDIR" > /dev/null
+
+    # rsync files
+    
+
+    #EXCLUDES='--exclude="*.bak*" --exclude="*video/zjw-favorites" --exclude="*git-modules" --exclude="*node_modules*"'
+    rsync $DRY_RUN -av --copy-links --exclude="*.git*" --exclude="data/photos/*" --exclude="*.bak*" --exclude="*video/zjw-favorites" --exclude="*git-modules" --exclude="*node_modules*" -e "$RSYNC_SSH_CMD" "$LOCAL_PATH/" "$RSYNC_HOST_PATH"
+
+elif [[ $PUBLISH_METHOD == 'sftp' ]]; then
+    # use sftp to transfer to server
+    zjwp-require sftp
+    
+    pushd "$ZJWP_PROJECT_GIT_ROOT" > /dev/null
+
+    source "scripts/publish.config"
+    echo $ftphost
+    echo $ftpdir
+    echo $ftpuser
+    echo $htmlfile    
+
+    #echo "|$ZJWP_PROJECT_WWW_SUBDIR|"
+    pushd "$ZJWP_PROJECT_WWW_SUBDIR" > /dev/null
+
+
+    SYMLINKS=$(find . -type l)
+    if [[ -n "$SYMLINKS" ]]; then
+        # sftp generally can't handle symlinks, so we need to copy the files
+        echo "Making site directory copy with deferenced symlinks: \"$ZJWP_PROJECT_WWW_SUBDIR-dereferenced-symlinks\""
+        pushd .. > /dev/null
+        cp -r -L "$ZJWP_PROJECT_WWW_SUBDIR" "$ZJWP_PROJECT_WWW_SUBDIR-dereferenced-symlinks"
+        pushd "$ZJWP_PROJECT_WWW_SUBDIR-dereferenced-symlinks" > /dev/null
+
+        # make sure the directory permissions push to sftp allow reading, regardless of local file permissons
+        #   (occasionally I've ended up with local files only readable by the owner, sftp such files to a webserver
+        #    left the webserver without permissions to read them)
+        chmod -R o+r .
+        find . -type d -exec chmod o+x {} \;
+    fi
+
+    ##
+    ## sftp to website
+    ##
+    ## Note, multiple ftp commands are needed, so echo them into a tmp file and then 
+    ##    pipe the tmp file contents to sftp
+    ##
+
+    #
+    # create command file
+    #
+    COMMANDS=$(mktemp)
+    info Sftp commands temp File: $COMMANDS
+read -r -d '' SCRIPT_TEXT << EOM
+        mkdir '$ftpdir' 
+        cd '$ftpdir'  
+        put .
+EOM
+    echo "$SCRIPT_TEXT" > $COMMANDS
+    #echo "ls" > "$COMMANDS"
+    info $(cat $COMMANDS)
+    #sftp -D "$COMMANDS" "$ftpuser@$ftphost"
+    #sftp -p -b "$COMMANDS" "$ftpuser@$ftphost"        
+
+    #
+    # run sftp
+    #
+    echo "$(cat $COMMANDS)" | sftp -r -p "$ftpuser@$ftphost"
+
+    #
+    # delete tmp files
+    #    
+    #echo "$(cat $COMMANDS)" | sftp "$ftpuser@$ftphost"
+    rm "$COMMANDS"
+
+    if [[ -n "$SYMLINKS" ]]; then        
+        popd > /dev/null
+        rm -rf "$ZJWP_PROJECT_WWW_SUBDIR-dereferenced-symlinks"
+        popd > /dev/null
+    fi
+    popd > /dev/null
+    popd > /dev/null
+fi

@@ -1,0 +1,58 @@
+# ifndef _ZJWP_PROJECT_GIT_ROOT
+#   $(error Environment variable ZJWP_PROJECT_GIT_ROOT is not set.  Have you run 'source scripts/zjwp/zjwp-set-path')
+# else
+#   $(info _ZJWP_PROJECT_GIT_ROOT: $(_ZJWP_PROJECT_GIT_ROOT))
+#   MK=$(addsuffix /scripts/makefile-variables, $(_ZJWP_PROJECT_GIT_ROOT))
+#   include $(call qs,$(MK))
+# endif
+
+ZJWP_PROJECT_GIT_ROOT := env('ZJWP_PROJECT_GIT_ROOT')
+#SRC_DIR := ZJWP_PROJECT_GIT_ROOT / 'www-site'
+OUT_DIR := ZJWP_PROJECT_GIT_ROOT / 'www-site'
+export VARIABLES_FILE := ZJWP_PROJECT_GIT_ROOT / 'scripts/justfile-variables'
+import x"${ZJWP_PROJECT_GIT_ROOT}/scripts/justfile-variables" 
+#ZJWP_PROJECT_GIT_ROOT + '/scripts/justfile-variables'
+#shell('echo $1',variables)
+
+test: 
+	
+
+#import "$variables"
+
+
+#TS_FILES = $(wildcard $(SRC_DIR)/**/*.ts)
+#SHELL = /bin/bash
+
+# Default target
+#all: build
+
+push: 
+	@./embed-revision	
+	cd ..; pwd;	git commit -m "Update revision" .
+	@echo 'Pushing changes to remote repository...''
+	git push
+	cd
+
+
+# Build target
+#build: $(TS_FILES)    
+build:	
+	@echo Root.... {{ZJWP_PROJECT_GIT_ROOT}}
+	@echo Building.... {{SRC_DIR}}
+	@pushd {{SRC_DIR}} > /dev/null;\
+	tsc;\
+	sed -i 's/export {};//' main.js
+	popd > /dev/null	
+
+revision:
+	@./embed-revision "{{SRC_DIR}}"
+
+# git commit -m "Update revision" .	
+
+# Clean target
+clean:
+	rm -rf {{OUT_DIR}}
+
+# Watch target
+watch:
+	tsc --watch

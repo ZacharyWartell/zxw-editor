@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+function zjwp-require()
+{
+    #echo trace require
+    for CMD in $@; do
+        #echo $CMD
+        which $CMD > /dev/null 2>&1
+        RET="$?"
+        #echo RET: $RET
+        if [[ "$RET" -ne 0 ]]; then
+            echo zjwp-require:  "$CMD" is required but not installed.
+            exit 1            
+        fi
+    done
+    return 0
+}

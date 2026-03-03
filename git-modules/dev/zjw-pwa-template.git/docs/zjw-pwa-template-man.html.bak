@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>zjw-pwa-template-man</title>
+    <style>
+        *.Template
+      	{
+          	border: 1px red;
+        }
+      	ul.DirectoryStructure, ul.DirectoryStructure ul
+      	{
+        }
+      	ul.DirectoryStructure li
+      	{
+        }
+        ul.DirectoryStructure span.Comment
+        {
+          	border: 1px dashed gray;
+            margin: 2px;
+        }
+     		ul.DirectoryStructure span.Comment:before
+      	{
+          	content: "// ";
+          	
+      	}
+    </style>
+  </head>
+  <body><br>
+    <h1>Directory structure</h1>
+    <ul class="DirectoryStructure">
+      <li>zjw-project-foo</li>
+      <ul>
+        <li>.git</li>
+        <li>git-modules</li>
+        <ul>
+          <li>zjw-pwa-template</li>
+          <ul>
+            <li>scripts</li>
+            <li>man</li>
+            <ul>
+              <li>zjw-pwa-template-man.html</li>
+            </ul>
+          </ul>
+        </ul>
+        <li>scripts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // scripts used for developing zjw-project-foo&nbsp; (make files, cmake files, etc.)</li>
+        <ul>
+          <li>zjwp =&gt; git-modules/zjw-pwa-template/scripts</li>
+        </ul>
+        <li>[www-app | www-site] <span class="Comment">pwa or traditional www site.&nbsp; This is the <u>only</u> directory published to the webserver</span>
+        
+        </li>
+        <ul>
+          <li>images</li>
+          <li>videos</li>
+          <li>index.html</li>
+        </ul>
+        <li>dev</li>
+      </ul>
+      <li class="Template"> |DIR NAME| <span class="Comment">|COMMENT|</span>        
+      </li>
+    </ul>
+    <p><br>
+    </p>
+  </body>
+</html>
