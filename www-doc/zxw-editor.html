@@ -42,6 +42,11 @@
         }
     </style>
     <script>
+        /**
+        Note On: "A Document that prints itself"
+        Note, the user of capitalization of SCRIPT and STYLE in the JavaScript comments and `` scripts is necessary to prevent 
+        the saveDOM function from split the DOM serialized string within JavaScript comments and `` strings.
+        */
         let fileHandle = null;
         let DOCS = "";
 
@@ -51,14 +56,14 @@
         If the DOM has not been saved during in this browser session, 
         open <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker" target="_blank">showSaveFilePicker</a> dialog to select save file.
             <p>
-                For &lt;script&gt; elements the &lt;script&gt; content, the save operation
+                For \u003CSCRIPT\u003E elements the \u003CSCRIPT\u003E content, the save operation
                 avoids letting XMLSerializer convert operator characters to HTML entities (i.e. do not change > to "&amp;gt;").
-                This is necessary since &lt;script&gt; content is typically JavaScript text
+                This is necessary since \u003CSCRIPT\u003E content is typically JavaScript text
             </p>        
         `;
         /**
          @brief saveDOM saves the current DOM to .html file whose file handle is 'handle' using XMLSerializer.
-         For <script> and <style> elements the content, avoid letting XMLSerializer convert operator characters 
+         For <SCRIPT> and <SCRIPT> elements the content, avoid letting XMLSerializer convert operator characters 
          to HTML entities (i.e. do not change > to "&gt;")
 
          Note the used of unicode escape sequences in some of the strings below are necessary to avoid
@@ -87,33 +92,33 @@
 
             // Write the contents of the file to the stream.
             let wholeDoc = new XMLSerializer().serializeToString(document);
-            let splits = wholeDoc.split(/<script>|<\/script>/);
+            let splits = wholeDoc.split(/\u003C\u002Fscript\u003E|\u003Cscript\u003E/);
             wholeDoc = "";
             for (let i = 0; i < splits.length; i++) {
-                if (i % 2 == 0) {// odd members are not <script> elements
+                if (i % 2 == 0) {// odd members are not <SCRIPT> elements
                     wholeDoc += splits[i];
                 }
-                else {// even members are <script> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;gt; )
+                else {// even members are <SCRIPT> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;gt; )
                     /**
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
                     const fixup = splits[i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
-                    wholeDoc += "<script>" + fixup + "<\u002Fscript>";
+                    wholeDoc += "\u003Cscript\u003E" + fixup + "\u003C\u002Fscript\u003E";
                 }
             }
 
-            splits = wholeDoc.split(/\u003Cstyle>|<\u002Fstyle>/);
+            splits = wholeDoc.split(/\u003C\u002Fstyle\u003E|\u003Cstyle\u003E/);
             wholeDoc = "";
             for (let i = 0; i < splits.length; i++) {
-                if (i % 2 == 0) {// odd members are not <style> elements
+                if (i % 2 == 0) {// odd members are not <STYLE> elements
                     wholeDoc += splits[i];
                 }
-                else {// even members are <style> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;gt; )
+                else {// even members are <STYLE> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;gt; )
                     /**
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
-                    const fixup = splits[i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
-                    wholeDoc += "\u003Cstyle>" + fixup + "<\u002Fstyle>";
+                    const fixup = splits[i].replaceAll("\u0026gt;", "\u003E").replaceAll("\u0026lt;", "\u003C");
+                    wholeDoc += "\u003Cstyle\u003E" + fixup + "\u003C\u002Fstyle\u003E";
                 }
             }    
             
