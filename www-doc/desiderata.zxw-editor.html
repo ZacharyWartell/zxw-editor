@@ -12,7 +12,6 @@
 @license Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 @git https://github.com/ZacharyWartell/zxw-editor
 
-VERSION: 0.1.56
 --><!-- zxw-editor END #1 --><head>
     
     
@@ -61,14 +60,14 @@ VERSION: 0.1.56
         open <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker" target="_blank">showSaveFilePicker</a> dialog to select save file.
             <p>
                 For \u003CSCRIPT\u003E elements the \u003CSCRIPT\u003E content, the save operation
-                avoids letting XMLSerializer convert operator characters to HTML entities (i.e. do not change > to "&amp;amp;gt;").
+                avoids letting XMLSerializer convert operator characters to HTML entities (i.e. do not change > to "&amp;amp;amp;amp;amp;amp;amp;gt;").
                 This is necessary since \u003CSCRIPT\u003E content is typically JavaScript text
             </p>        
         `;
         /**
          @brief saveDOM saves the current DOM to .html file whose file handle is 'handle' using XMLSerializer.
          For <SCRIPT> and <SCRIPT> elements the content, avoid letting XMLSerializer convert operator characters 
-         to HTML entities (i.e. do not change > to "&amp;gt;")
+         to HTML entities (i.e. do not change > to "&amp;amp;amp;amp;amp;amp;gt;")
 
          Note the used of unicode escape sequences in some of the strings below are necessary to avoid
          replacing characters in situations they should not be replaced.
@@ -102,7 +101,7 @@ VERSION: 0.1.56
                 if (i % 2 == 0) {// odd members are not <SCRIPT> elements
                     wholeDoc += splits[i];
                 }
-                else {// even members are <SCRIPT> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;amp;gt; )
+                else {// even members are <SCRIPT> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt; )
                     /**
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
@@ -117,7 +116,7 @@ VERSION: 0.1.56
                 if (i % 2 == 0) {// odd members are not <STYLE> elements
                     wholeDoc += splits[i];
                 }
-                else {// even members are <STYLE> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;amp;gt; )
+                else {// even members are <STYLE> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt; )
                     /**
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
@@ -132,9 +131,9 @@ VERSION: 0.1.56
              * (CORS policy will not allow <link> to be loaded when a browser is opening a local file)
              */
             const removals=[
-            `<link rel="manifest" crossorigin="use-credentials" href="manifest.json" />`,
-            `<link rel="shortcut icon" type="image/png" href="icons/icon48.png" />`,
-            `<link rel="shortcut icon" type="image/png" href="icons/icon144.png" />`];
+            ``,
+            ``,
+            ``];
             for (let r of removals)
             {
                 const tmp = wholeDoc.replace(r,""); 
@@ -177,7 +176,7 @@ VERSION: 0.1.56
          */
         DOCS +=
         `@##GUI
-        <span>Redact &amp; Save</span> | Save DOM to the target .html file, but do not save any HTML element with class attribute called 'Redacted'.        
+        <span>Redact &amp;amp;amp;amp;amp;amp; Save</span> | Save DOM to the target .html file, but do not save any HTML element with class attribute called 'Redacted'.        
         If the DOM has not been saved during in this browser session, 
         open <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker" target="_blank">showSaveFilePicker</a> dialog to select save file.
         `;
@@ -233,8 +232,13 @@ VERSION: 0.1.56
          on and off of all HTML elements with the contentedible attribute.
 
          Chrome will only follow hyperlinks using the standard gestures, if Edit Mode is disabled.
-        `;        
-        function zxw_editor_main() {
+        `;  
+        const DEV_MODE=true;      
+        //const DEV_MODE=false;      
+        function zxw_editor_main() 
+        {
+            if (!DEV_MODE)
+                document.getElementById("PlaceHolder").addEventListener('click',(e)=>{e.remove()});
             let helpDialog = document.getElementById("HelpDialog");
             //document.getElementById("OpenButton").addEventListener('click', openCallback);
             document.getElementById("SaveButton").addEventListener('click', saveCallback);
@@ -303,13 +307,41 @@ VERSION: 0.1.56
     <!-- zxw-editor EHD <header> -->    
     <!-- zxw-editor END #4 -->    
 
-    <div id="UserDocument" contenteditable="" style="display: flex;flex-direction: column;"><div style="align-self:center;">
-<cite><a href="https://www.desiderata.com/desiderata.html">https://www.desiderata.com/desiderata.html</a></cite>    
-</div><blockquote>
+    <div id="UserDocument" contenteditable="" style="display: flex;flex-direction: column;">
 
-<h1 style="line-height: 48px; margin: 0px; text-align: center; padding-bottom: 10px; background-color: rgb(252, 249, 233);"><font color="#333333" face="Lato, sans-serif"></font></h1><h1 style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; font-size: 30px; font-weight: 400; line-height: 48px; margin: 0px; text-align: center; padding-bottom: 10px; background-color: rgb(252, 249, 233);">Desiderata: Original Text</h1><p class="center" style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; text-align: center; list-style-type: none; background-color: rgb(252, 249, 233);"><em>This is the original text from the book where Desiderata was first published.</em></p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);"><span class="bold" style="font-weight: 900;">Go placidly</span> amid the noise and the haste, and remember what peace there may be in silence. As far as possible, without surrender, be on good terms with all persons.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">Speak your truth quietly and clearly; and listen to others, even to the dull and the ignorant; they too have their story.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">Avoid loud and aggressive persons; they are vexatious to the spirit. If you compare yourself with others, you may become vain or bitter, for always there will be greater and lesser persons than yourself.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">Enjoy your achievements as well as your plans. Keep interested in your own career, however humble; it is a real possession in the changing fortunes of time.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">Exercise caution in your business affairs, for the world is full of trickery. But let this not blind you to what virtue there is; many persons strive for high ideals, and everywhere life is full of heroism.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">Be yourself. Especially do not feign affection. Neither be cynical about love; for in the face of all aridity and disenchantment, it is as perennial as the grass.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">Take kindly the counsel of the years, gracefully surrendering the things of youth.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">Nurture strength of spirit to shield you in sudden misfortune. But do not distress yourself with dark imaginings. Many fears are born of fatigue and loneliness.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">Beyond a wholesome discipline, be gentle with yourself. You are a child of the universe no less than the trees and the stars; you have a right to be here.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">And whether or not it is clear to you, no doubt the universe is unfolding as it should. Therefore be at peace with God, whatever you conceive Him to be. And whatever your labors and aspirations, in the noisy confusion of life, keep peace in your soul. With all its sham, drudgery and broken dreams, it is still a beautiful world. Be cheerful. Strive to be happy.</p><p style="color: rgb(51, 51, 51); font-family: Lato, sans-serif; line-height: 24px; margin: 0px 67.9977px 12px; background-color: rgb(252, 249, 233);">by Max Ehrmann ©1927<br /></p><div><br /></div>
-</blockquote>
-<div style="align-self: center;"><img src="https://ichef.bbci.co.uk/images/ic/1376xn/p08530wr.jpg.webp" /></div></div>
+<div id="PlaceHolder"><p style="padding: 5px; text-align: center; background-color: lightgreen;">
+    Click "Edit Mode" to enable editing.<br />
+    Then your content goes here.
+</p><hr />
+
+<p style="text-align: center;">
+    "Math is magical, but math approached like magic is just superstition—and numerology is where the intellect goes to die."<br />
+    <cite>Harris, Sam. Waking Up: A Guide to Spirituality Without Religion (p. 168). Simon &amp; Schuster. Kindle Edition. </cite>
+</p>
+
+<br />
+<p style="text-align: center;">
+    "Nonetheless some numbers serendipitously thread their way through literary = history.    <div style="display: inline-block;"><div style="font-size:xx-small;"> 🔥 🔥 <sup>🔥</sup> 🔥 🔥 </div><div style="font-size:large;">0101010</div></div>, *<sup><a target="_blank" href="https://en.wikipedia.org/wiki/Kleene_star">†</a>
+<a target="_blank" href="https://en.wikipedia.org/wiki/ASCII">‡</a></sup>, <embed width="20" src="don-t-panic--dan-gerhard-01.svg" />"  -  ZJW</p><br /><div style="border: 1px solid black; border-radius: 0.5em;">
+<blockquote>
+
+<h1 style="font-family: Lato, sans-serif; font-size: 30px; font-weight: 400; line-height: 48px; margin: 0px; text-align: center; padding-bottom: 10px; ">Desiderata: Original Text</h1><p style="text-align:center;"><em>This is the original text from the book where Desiderata was first published.</em></p><p><span class="bold" style="font-weight: 900;">Go placidly</span> amid the noise and the haste, and remember what peace there may be in silence. As far as possible, without surrender, be on good terms with all persons.</p><p>Speak your truth quietly and clearly; and listen to others, even to the dull and the ignorant; they too have their story.</p><p>Avoid loud and aggressive persons; they are vexatious to the spirit. If you compare yourself with others, you may become vain or bitter, for always there will be greater and lesser persons than yourself.</p><p>Enjoy your achievements as well as your plans. Keep interested in your own career, however humble; it is a real possession in the changing fortunes of time.</p><p>Exercise caution in your business affairs, for the world is full of trickery. But let this not blind you to what virtue there is; many persons strive for high ideals, and everywhere life is full of heroism.</p><p>Be yourself. Especially do not feign affection. Neither be cynical about love; for in the face of all aridity and disenchantment, it is as perennial as the grass.</p><p>Take kindly the counsel of the years, gracefully surrendering the things of youth.</p><p>Nurture strength of spirit to shield you in sudden misfortune. But do not distress yourself with dark imaginings. Many fears are born of fatigue and loneliness.</p><p>Beyond a wholesome discipline, be gentle with yourself. You are a child of the universe no less than the trees and the stars; you have a right to be here.</p><p>And whether or not it is clear to you, no doubt the universe is unfolding as it should. Therefore be at peace with God, whatever you conceive Him to be. And whatever your labors and aspirations, in the noisy confusion of life, keep peace in your soul. With all its sham, drudgery and broken dreams, it is still a beautiful world. Be cheerful. Strive to be happy.</p><p>by Max Ehrmann ©1927<br /></p><div><br /></div>
+</blockquote>    
+<p style="text-align:center;">
+<cite style="text-align:center;">
+From 
+<a href="https://www.desiderata.com/desiderata.html">https://www.desiderata.com/desiderata.html</a>.   Accessed March 30, 2026.    
+</cite>
+</p></div>    
+<div style="align-self: center;"><figure style="text-align: center;">
+<img src="NASA-Apollo8-Dec24-Earthrise.jpg" />    
+    <figcaption style="text-align;center;"> 
+        Earthrise, 1968 CE. First photograph of Earth taken by an Earth Being <span style="font-style: italic;">(</span><span style="font-style: italic;">הָֽאָדָ֖ם), </span>William Alison Anders (17 October 1933 – 7 June 2024 ).<br /><cite>From <a href="NASA/Bill Anders - http://www.hq.nasa.gov/office/pao/History/alsj/a410/AS8-14-2383HR.jpg">http://www.hq.nasa.gov/office/pao/History/alsj/a410/AS8-14-2383HR.jpg</a>. Accessed March 20, 2026.</cite></figcaption>
+</figure>
+</div></div>
+
+
+</div>
 
     <!-- zxw-editor BEGIN #5 -->
     <!--
