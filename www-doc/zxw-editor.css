@@ -1,0 +1,48 @@
+/*
+        All code delimited by 
+            <!- - zxw-editor BEGIN -- !>
+        and
+            <!- - zxw-editor END -- !>
+        
+        are @license Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.         
+        - @git https://github.com/ZacharyWartell/zxw-editor
+        - @author Zachary Justin Wartell, 2026.
+*/
+/** <!- - zxw-editor BEGIN -- !> **/
+table {
+    border: solid 2px black;
+    border-collapse: collapse;
+    width: fit-content;
+}
+
+td {
+    border: solid 1px;
+}
+
+menu {
+    border: solid 2px black;
+    padding: 2px;
+}
+
+*.Redacted {
+    border: 1px dotted red;
+}
+
+*.Redacted::before {
+    content: "Redacted";
+    background-color: yellow;
+    color: red;
+}
+
+ul#GUI>li>span:first-child {
+    border: 1px black solid;
+    border-radius: 0.25em;
+    margin-right: 1em;
+}
+
+header.zxw-editor {
+    position: sticky;
+    top: 0;
+    background-color: aliceblue;
+}
+/** <!- - zxw-editor END -- !> **/
