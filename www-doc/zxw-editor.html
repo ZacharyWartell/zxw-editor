@@ -105,7 +105,7 @@
         /**
          @brief saveDOM saves the current DOM to .html file whose file handle is 'handle' using XMLSerializer.
          For <SCRIPT> and <SCRIPT> elements the content, avoid letting XMLSerializer convert operator characters 
-         to HTML entities (i.e. do not change > to "&amp;amp;amp;amp;amp;amp;gt;")
+         to HTML entities (i.e. do not change > to "&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt;")
 
          Note the used of unicode escape sequences in some of the strings below are necessary to avoid
          replacing characters in situations they should not be replaced.
@@ -133,28 +133,46 @@
 
             // Write the contents of the file to the stream.
             let wholeDoc = new XMLSerializer().serializeToString(document);
-            let splits = wholeDoc.split(/\u003C\u002Fscript\u003E|\u003Cscript\u003E/);
+
+            // handle script fixups
+            //let splits = wholeDoc.split(/\u003C\u002Fscript\u003E|\u003Cscript\u003E/);
+            //let splitsStartScript = wholeDoc.split(/\u003Cscript[^\u003E]*\u003E/);  // start script tag
+            let splitsStartScript = wholeDoc.split(/\u003Cscript\u003E/);  // start script tag            
             wholeDoc = "";
-            for (let i = 0; i < splits.length; i++) {
-                if (i % 2 == 0) {// odd members are not <SCRIPT> elements
-                    wholeDoc += splits[i];
+            wholeDoc += splitsStartScript[0];
+            for (let i = 1; i < splitsStartScript.length; i++) {
+                const splitsEndScript = splitsStartScript[i].split(/[^>]\u003C\/script\u003E/); // end script tag
+                if (splitsEndScript.length == 1) {
+                    wholeDoc += splitsEndScript[0];
                 }
-                else {// even members are <SCRIPT> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt; )
-                    /**
-                     *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
-                     */
-                    const fixup = splits[i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
+                else if (splitsEndScript.length == 2) {
+                    const fixup = splitsEndScript[0].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<").replaceAll("\u0026amp;", "&");
                     wholeDoc += "\u003Cscript\u003E" + fixup + "\u003C\u002Fscript\u003E";
+                    wholeDoc += splitsEndScript[1];
                 }
             }
+            // wholeDoc = "";
+            // for (let i = 0; i < splits.length; i++) {
+            //     if (i % 2 == 0) {// odd members are not <SCRIPT> elements
+            //         wholeDoc += splits[i];
+            //     }
+            //     else {// even members are <SCRIPT> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt; )
+            //         /**
+            //          *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
+            //          */
+            //         const fixup = splits[i].replaceAll("\u0026gt;", ">").replaceAll("\u0026lt;", "<");
+            //         wholeDoc += "\u003Cscript\u003E" + fixup + "\u003C\u002Fscript\u003E";
+            //     }
+            // }
 
+            // handle style fixups
             splits = wholeDoc.split(/\u003C\u002Fstyle\u003E|\u003Cstyle\u003E/);
             wholeDoc = "";
             for (let i = 0; i < splits.length; i++) {
                 if (i % 2 == 0) {// odd members are not <STYLE> elements
                     wholeDoc += splits[i];
                 }
-                else {// even members are <STYLE> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt; )
+                else {// even members are <STYLE> elements, so undo XMLSerializer conversion of certain characters into htmt entities (i.e. > to &amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt; )
                     /**
                      *  \todo this list is incomplete, need to find listing inte HTML spec's page and convert it into code...
                      */
@@ -189,7 +207,8 @@
             }
             console.log("saveDOM complete");
         }
-        async function saveCallback() {
+        
+         async function saveCallback() {
             if (fileHandle !== null)
                 await saveDOM(fileHandle);
             else {
