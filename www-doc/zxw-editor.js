@@ -4,6 +4,123 @@
 @git https://github.com/ZacharyWartell/zxw-editor
 */
 
+
+const ZXW_EDITOR_HTML=
+`
+    <!-- zxw-editor BEGIN #4 -->
+    <!--
+         All code delimited by 
+             <!- - zxw-editor BEGIN -- !>
+         and
+             <!- - zxw-editor END -- !>
+         
+         are @license Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.         
+            - @git https://github.com/ZacharyWartell/zxw-editor
+            - @author Zachary Justin Wartell, 2026.
+     -->
+    <!-- zxw-editor BEGIN <header> -->
+    <header class="zxw-editor" style="border: 1px black solid; padding: 2px; resize: block; overflow: hidden; max-height: fit-content;">
+        <div style="border: 1px black solid; padding: 2px; text-align: center;">
+            <b><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor">zxw-editor</a></b> <sup><a target="_blank" href="https://github.com/ZacharyWartell/zxw-editor/commits/main/"><!--APPVERSION-->0.1.30</a><span>(α)</span></sup>
+            | Author:
+            Zachary Wartell, License:
+            <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
+                Commons
+                Attribution-NonCommercial-ShareAlike 4.0 International License</a>
+        </div>
+        <menu style="margin-bottom: 0px;">
+            <button disabled="" id="OpenButton">Open</button>
+            <button id="SaveButton">Save</button>
+            <button id="RedactSaveButton">Redact &amp; Save</button>
+            <div style="border: 1px solid black; display: inline-block;">
+                <label for="EditMode">Edit Mode</label>
+                <input type="checkbox" id="EditMode" value="EditMode" />
+            </div>
+            <button id="HelpButton" onclick="window.helpDialog.showModal();">Help</button>
+        </menu>
+    </header>
+    <!-- zxw-editor EHD <header> -->
+    <!-- zxw-editor END #4 -->
+
+<!-- zxw-editor BEGIN #5 -->
+    <!--
+         All code delimited by 
+             <!- - zxw-editor BEGIN -- !>
+         and
+             <!- - zxw-editor END -- !>
+         
+         are @license Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.         
+            - @git https://github.com/ZacharyWartell/zxw-editor
+            - @author Zachary Justin Wartell, 2026.
+     -->
+    <!-- zxw-editor BEGIN <dialog> -->
+    <div class="zxw-editor">
+        <dialog id="HelpDialog">
+            <h1 style="text-align: center;">User Guide</h1>
+
+            <section>
+                <h2>Overview</h2>
+                <div style="text-align: center;">
+                    α-<span><!--APPVERSION-->0.1.30</span>
+                </div>
+                <p>
+                    zxw-editor is an experimental 'in-place' HTML editor.
+                </p>
+                <ul>
+                    <li>zxw-editor.html can be saved to a local file in Chrome. The resulting saved local .html file
+                        can be openned directly in Chrome and further edited in Chrome. The saved local .html embeds
+                        the zxw-editor code itself. Therefore once saved, the saved .html is completely standalone and
+                        editable.
+                        <ul>
+                            <li>zxw-editor is a single page, <a href="https://en.wikipedia.org/wiki/Static_web_page" target="_blank">static webpage</a>.</li>
+                            <li>zxw-editor does <em>not</em> communicate to any server.</li>
+                            <li>zxw-editor (at least under Chrome) can be installed as a <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps" target="_blank">Progressive Web App</a>,
+                                see <a target="_blank" href="https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DDesktop">support.google.com</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        zxw-editor neither requires nor uses any 3rd party framework (React, Vue, Angular).
+                    </li>
+                    <li>
+                        zxw-editor leverages <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/contenteditable" target="_blank">contentedible</a>
+                        and
+                        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker" target="_blank">showSaveFilePicker</a>
+                        to save edits to the webpage (i.e. the local DOM) to a local file.
+                    </li>
+                </ul>
+                Caveats:
+                <ul>
+                    <li> zxw-editor assumes the user is comfortable and familiar with using the
+                        <a href="https://developer.chrome.com/docs/devtools/dom" target="_blank">Chrome Inspector </a>
+
+                        to edit the DOM in addition to editing the contentedible &lt;div&gt; directly using the
+                        browser's inherent
+                        <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/contenteditable" target="_blank">contentedible</a>
+                        editing features.
+                    </li>
+                    <li>zxw-editor is only tested on the Chrome browser.</li>
+                    <li>zxw-editor is alpha(α) software. A common Computer Science 101 programming assignment at universities
+                        like MIT is to write a program that prints out an exact replica of itself. This is tricky.
+                        The more complicated the programming language being used, the trickier it is.
+                        Undoubtedly, the zxw-editor 'save-itself-to-a-file' algorithm still does not handle all
+                        situations.
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h2>GUI</h2>
+                <hr />
+                <ul id="GUI" data-non-saved-content="">
+                </ul>
+                <hr />
+            </section>
+            <button commandfor="HelpDialog" command="close">Close</button>
+        </dialog>
+    </div>
+    <!-- zxw-editor END <dialog> -->
+    <!-- zxw-editor END #5 -->  
+`;
 /**
 Note On: "A Document that prints itself"
 Note, the user of capitalization of SCRIPT and STYLE in the JavaScript comments and `` scripts is necessary to prevent 
@@ -210,7 +327,32 @@ DOCS +=
 
 //const DEV_MODE=true;      
 const DEV_MODE = false;
-function zxw_editor_main() {
+async function zxw_editor_main() {
+    // Fetch the external HTML file
+    if (false)
+        await fetch('./git-modules/zxw-editor.git/www-doc/zxw-editor-header.html')
+            .then(response => response.text())
+            .then(data => {
+            // Inject the HTML code into the container
+            const frag=document.createDocumentFragment();
+            frag.innerHTML=data;
+            document.appendChild(frag);
+            })
+            .catch(error => console.error('Error loading HTML:', error));    
+    else
+    {
+        //const frag=document.createDocumentFragment();
+        const frag=document.createElement('div');
+        frag.innerHTML=ZXW_EDITOR_HTML;
+        frag.setAttribute("id","ZXW_EDITOR_HTML");
+        const old = document.getElementById("ZXW_EDITOR_HTML");
+        if (old !== null)
+            old.remove();
+        document.body.insertAdjacentElement('afterbegin',frag);
+        const force=document.body.lastElementChild;
+        console.log("test");
+    }
+
     let helpDialog = document.getElementById("HelpDialog");
     //document.getElementById("OpenButton").addEventListener('click', openCallback);
     document.getElementById("SaveButton").addEventListener('click', saveCallback);
@@ -242,6 +384,9 @@ function zxw_editor_main() {
             }
         }
     )
+
+
 }
 window.zxw_editor_main = zxw_editor_main;
+//zxw_editor_main();
 //window.helpDialog = helpDialog;
